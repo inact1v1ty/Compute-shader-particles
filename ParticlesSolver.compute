@@ -1,0 +1,24 @@
+﻿#pragma kernel Update
+
+struct Particle
+{
+	float2 position;
+	float2 velocity;
+};
+
+float dt;
+int shouldMove;
+float2 mousePosition;
+
+RWStructuredBuffer<Particle> Particles;
+
+[numthreads(1024,1,1)]
+void Update(uint3 id : SV_DispatchThreadID)
+{
+	if (shouldMove > 0) {
+		float2 v = float2(mousePosition.x - Particles[id.x].position.x, mousePosition.y - Particles[id.x].position.y);
+		float d2 = v.x * v.x + v.y * v.y;
+		Particles[id.x].velocity = Particles[id.x].velocity + 5 * (v / d2) * dt;
+	}
+	Particles[id.x].position = Particles[id.x].position + Particles[id.x].velocity * dt;
+}
